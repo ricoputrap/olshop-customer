@@ -1,6 +1,12 @@
+import ProductCatalogView from '@/components/product-catalog/ProductCatalogView';
+import { TProductCatalogItem, TProductsResponse } from '@/components/product-catalog/index.types';
+import { GetServerSideProps, NextPage } from 'next'
 import Head from 'next/head'
 
-export default function Home() {
+interface Props {
+  products: TProductCatalogItem[]
+}
+const Home: NextPage<Props> = ({ products }) => {
   return (
     <>
       <Head>
@@ -10,8 +16,23 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        OLSHOP
+        <ProductCatalogView products={ products } />
       </main>
     </>
   )
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const PRODUCTS_URL = "http://localhost:5005/v1/products";
+
+  const response = await fetch(PRODUCTS_URL);
+  const products: TProductsResponse = await response.json();
+
+  return {
+    props: {
+      products: products.data
+    }
+  }
+}
+
+export default Home;
